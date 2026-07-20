@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planning Sport/Nutrition</title>
+    <title>Coach Nutrition & Sport</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        :root{--bg-primary:#0a0a0a;--bg-secondary:#141414;--bg-tertiary:#1c1c1e;--text-primary:#ffffff;--text-secondary:#8e8e93;--accent:#ff3b30;--accent-secondary:#ff9500;--success:#34c759;--water:#007aff;--border:#2c2c2e;--protein:#5856d6;--warning:#ffcc00}
+        :root{--bg-primary:#0a0a0a;--bg-secondary:#141414;--bg-tertiary:#1c1c1e;--text-primary:#ffffff;--text-secondary:#8e8e93;--accent:#ff3b30;--accent-secondary:#ff9500;--success:#34c759;--water:#007aff;--border:#2c2c2e;--protein:#5856d6;--warning:#ffcc00;--imc-normal:#34c759;--imc-warning:#ff9500;--imc-danger:#ff3b30}
         body{background-color:var(--bg-primary);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;min-height:100vh;padding-bottom:90px}
         .header{background:var(--bg-secondary);padding:20px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
         .header-title{font-size:28px;font-weight:800}
@@ -49,6 +49,7 @@
         .validate-btn{background:var(--success);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s}
         .validate-btn.validated{background:var(--bg-tertiary);color:var(--text-secondary)}
         .validate-btn:active{transform:scale(0.95)}
+        .reset-day-btn{background:transparent;color:var(--accent);border:1px solid var(--accent);padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer}
         .timeline-list{padding:8px 0}
         .timeline-item{display:flex;padding:16px 20px;border-bottom:1px solid var(--border);transition:opacity 0.2s}
         .timeline-item:last-child{border-bottom:none}
@@ -118,7 +119,7 @@
         ::-webkit-scrollbar{width:0;height:0}
         .category-title{grid-column:1/-1;color:var(--text-secondary);font-size:11px;text-transform:uppercase;margin-top:8px;margin-bottom:4px;font-weight:600}
         
-        /* Styles pour le constructeur de repas */
+        /* Constructeur de repas */
         .meal-builder{background:var(--bg-tertiary);border-radius:12px;padding:16px;margin:12px 20px;border:1px solid var(--border)}
         .meal-builder-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
         .meal-builder-title{font-size:16px;font-weight:700;color:var(--accent-secondary)}
@@ -137,7 +138,7 @@
         .select-food{width:100%;padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:14px;margin-bottom:8px;outline:none}
         .select-food:focus{border-color:var(--accent)}
         
-        /* Styles pour les onglets */
+        /* Pages */
         .tab-content{display:none}
         .tab-content.active{display:block}
         .week-grid{display:grid;gap:12px}
@@ -148,27 +149,44 @@
         .week-day-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
         .week-stat-value{font-size:18px;font-weight:700}
         .week-stat-label{font-size:10px;color:var(--text-secondary);text-transform:uppercase}
-        .chart-container{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
-        .chart-title{font-size:16px;font-weight:700;margin-bottom:16px}
-        .bar-chart{display:flex;align-items:flex-end;gap:4px;height:150px;padding-top:20px}
-        .bar{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:4px;position:relative;transition:height 0.3s}
-        .bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text-secondary);white-space:nowrap}
-        .bar-value{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:600}
-        .settings-item{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-        .settings-label{font-weight:600}
-        .settings-value{color:var(--text-secondary)}
-        .input-number{width:80px;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);text-align:center;font-size:16px}
+        
+        /* Stats avancées */
+        .weight-graph{height:150px;background:var(--bg-tertiary);border-radius:12px;margin:16px 0;position:relative;overflow:hidden;border:1px solid var(--border)}
+        .weight-line{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--success);transform-origin:left;transform:rotate(-5deg)}
+        .weight-points{display:flex;justify-content:space-between;align-items:flex-end;height:100%;padding:20px 10px}
+        .weight-point{display:flex;flex-direction:column;align-items:center;gap:4px}
+        .weight-dot{width:8px;height:8px;background:var(--success);border-radius:50%;border:2px solid var(--bg-primary)}
+        .weight-value{font-size:10px;color:var(--text-secondary)}
+        .weight-date{font-size:9px;color:var(--text-secondary)}
+        .imc-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+        .imc-value{font-size:32px;font-weight:800;text-align:center;margin:12px 0}
+        .imc-bar{height:8px;background:linear-gradient(90deg,var(--imc-danger) 0%,var(--imc-warning) 50%,var(--imc-normal) 100%);border-radius:4px;position:relative;margin:12px 0}
+        .imc-indicator{position:absolute;top:-4px;width:16px;height:16px;background:white;border:3px solid var(--bg-primary);border-radius:50%;transform:translateX(-50%)}
+        .imc-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)}
+        .input-group{margin-bottom:16px}
+        .input-label{display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase}
+        .input-field{width:100%;padding:12px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:16px}
+        .streak-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:white;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;margin-left:8px}
+        .coach-tip{background:linear-gradient(135deg,rgba(52,199,89,0.1),rgba(0,122,255,0.1));border:1px solid var(--success);border-radius:12px;padding:16px;margin:16px 0}
+        .coach-tip-title{color:var(--success);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+        .coach-tip-text{font-size:14px;color:var(--text-secondary);line-height:1.5}
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="header-title" id="page-title">Planning Sport/Nutrition</div>
-        <div class="header-date" id="header-date">Programme Militaire</div>
+        <div class="header-title" id="page-title">Coach Nutrition</div>
+        <div class="header-date" id="header-date">Ton programme personnalisé</div>
     </div>
 
     <!-- PAGE JOUR -->
     <div id="day-page" class="page tab-content active">
         <div class="container">
+            <!-- Streak -->
+            <div style="display:flex;align-items:center;margin-bottom:16px">
+                <div style="font-size:18px;font-weight:700">🔥 Série en cours :</div>
+                <div class="streak-badge" id="streak-badge">0 jour</div>
+            </div>
+
             <div class="week-nav">
                 <button class="week-nav-btn" id="prev-week">‹</button>
                 <div class="week-info">
@@ -200,70 +218,25 @@
                 <div style="text-align:center;font-size:13px;color:var(--text-secondary)"><span id="water-current">0</span> / <span id="water-goal">3000</span> ml</div>
             </div>
 
+            <!-- Coach Tip du jour -->
+            <div class="coach-tip" id="coach-tip" style="display:none">
+                <div class="coach-tip-title">💡 Conseil du coach</div>
+                <div class="coach-tip-text" id="coach-tip-text"></div>
+            </div>
+
+            <!-- TIMELINE CHRONOLOGIQUE -->
             <div class="timeline">
-                <div class="timeline-header"><div class="timeline-title">Planning Nutrition</div><button class="validate-btn" id="validate-day">Valider</button></div>
+                <div class="timeline-header">
+                    <div class="timeline-title">📋 Planning du jour</div>
+                    <div style="display:flex;gap:8px">
+                        <button class="reset-day-btn" onclick="resetCurrentDay()">🗑️ Reset</button>
+                        <button class="validate-btn" id="validate-day">Valider</button>
+                    </div>
+                </div>
                 <div class="timeline-list" id="timeline-list"></div>
             </div>
 
-            <!-- CONSTRUCTEUR DE DÉJEUNER -->
-            <div class="timeline" style="margin-top:16px">
-                <div class="timeline-header"><div class="timeline-title">🍽️ Déjeuner (libre)</div></div>
-                <div class="meal-builder">
-                    <div class="meal-builder-header">
-                        <span class="meal-builder-title">Composer ton repas</span>
-                        <span class="meal-total" id="lunch-total">0 cal</span>
-                    </div>
-                    
-                    <div class="meal-section">
-                        <div class="meal-section-title">Entrée <span id="lunch-starter-count">(0)</span></div>
-                        <button class="add-btn" onclick="openFoodSelector('lunch','starter')">+ Ajouter une entrée</button>
-                        <div class="selected-items" id="lunch-starter-items"></div>
-                    </div>
-                    
-                    <div class="meal-section">
-                        <div class="meal-section-title">Plat <span id="lunch-main-count">(0)</span></div>
-                        <button class="add-btn" onclick="openFoodSelector('lunch','main')">+ Ajouter un plat</button>
-                        <div class="selected-items" id="lunch-main-items"></div>
-                    </div>
-                    
-                    <div class="meal-section">
-                        <div class="meal-section-title">Dessert <span id="lunch-dessert-count">(0)</span></div>
-                        <button class="add-btn" onclick="openFoodSelector('lunch','dessert')">+ Ajouter un dessert</button>
-                        <div class="selected-items" id="lunch-dessert-items"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CONSTRUCTEUR DE DÎNER -->
-            <div class="timeline" style="margin-top:16px">
-                <div class="timeline-header"><div class="timeline-title">🌙 Dîner (libre)</div></div>
-                <div class="meal-builder">
-                    <div class="meal-builder-header">
-                        <span class="meal-builder-title">Composer ton repas</span>
-                        <span class="meal-total" id="dinner-total">0 cal</span>
-                    </div>
-                    
-                    <div class="meal-section">
-                        <div class="meal-section-title">Entrée <span id="dinner-starter-count">(0)</span></div>
-                        <button class="add-btn" onclick="openFoodSelector('dinner','starter')">+ Ajouter une entrée</button>
-                        <div class="selected-items" id="dinner-starter-items"></div>
-                    </div>
-                    
-                    <div class="meal-section">
-                        <div class="meal-section-title">Plat <span id="dinner-main-count">(0)</span></div>
-                        <button class="add-btn" onclick="openFoodSelector('dinner','main')">+ Ajouter un plat</button>
-                        <div class="selected-items" id="dinner-main-items"></div>
-                    </div>
-                    
-                    <div class="meal-section">
-                        <div class="meal-section-title">Dessert <span id="dinner-dessert-count">(0)</span></div>
-                        <button class="add-btn" onclick="openFoodSelector('dinner','dessert')">+ Ajouter un dessert</button>
-                        <div class="selected-items" id="dinner-dessert-items"></div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="bilan-btn" id="bilan-btn">📊 Bilan de la journée</button>
+            <button class="bilan-btn" id="bilan-btn">📊 Bilan & Écarts</button>
         </div>
     </div>
 
@@ -285,14 +258,58 @@
     <!-- PAGE STATS -->
     <div id="stats-page" class="page tab-content">
         <div class="container">
-            <div class="chart-container">
-                <div class="chart-title">Calories sur 7 jours</div>
-                <div class="bar-chart" id="calories-chart"></div>
+            <!-- Carte IMC -->
+            <div class="imc-card">
+                <div style="text-align:center;font-size:14px;color:var(--text-secondary);margin-bottom:8px">Ton IMC</div>
+                <div class="imc-value" id="imc-value">--</div>
+                <div class="imc-bar">
+                    <div class="imc-indicator" id="imc-indicator" style="left:0%"></div>
+                </div>
+                <div class="imc-labels">
+                    <span>Maigre</span>
+                    <span>Normal</span>
+                    <span>Surpoids</span>
+                    <span>Obèse</span>
+                </div>
+                <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--text-secondary)" id="imc-text">
+                    Renseigne ton poids et taille dans les paramètres
+                </div>
             </div>
-            <div class="chart-container">
-                <div class="chart-title">Protéines (g) sur 7 jours</div>
-                <div class="bar-chart" id="protein-chart"></div>
+
+            <!-- Suivi poids -->
+            <div class="stats-card">
+                <div class="stats-header">
+                    <div class="stats-day">📉 Évolution du poids</div>
+                    <button class="btn-primary" style="width:auto;padding:8px 16px;font-size:13px;margin:0" onclick="openWeightModal()">⚖️ Pesée</button>
+                </div>
+                <div class="weight-graph" id="weight-graph">
+                    <div class="weight-points" id="weight-points"></div>
+                </div>
+                <div style="display:flex;justify-content:space-around;margin-top:12px;text-align:center">
+                    <div>
+                        <div style="font-size:11px;color:var(--text-secondary)">Début</div>
+                        <div style="font-weight:700" id="weight-start">--</div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:var(--text-secondary)">Actuel</div>
+                        <div style="font-weight:700;color:var(--success)" id="weight-current">--</div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:var(--text-secondary)">Objectif</div>
+                        <div style="font-weight:700;color:var(--accent)" id="weight-goal-display">--</div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:var(--text-secondary)">Perdu</div>
+                        <div style="font-weight:700;color:var(--success)" id="weight-lost">--</div>
+                    </div>
+                </div>
             </div>
+
+            <div class="chart-container" style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+                <div style="font-size:16px;font-weight:700;margin-bottom:16px">Calories sur 7 jours</div>
+                <div style="display:flex;align-items:flex-end;gap:4px;height:150px;padding-top:20px" id="calories-chart"></div>
+            </div>
+            
             <div class="stats-card">
                 <div class="stats-header"><div class="stats-day">Moyennes de la semaine</div></div>
                 <div class="stats-grid">
@@ -308,19 +325,44 @@
     <!-- PAGE PARAMÈTRES -->
     <div id="settings-page" class="page tab-content">
         <div class="container">
-            <div class="settings-item">
-                <span class="settings-label">Objectif calories</span>
-                <input type="number" class="input-number" id="goal-calories" value="2200" onchange="updateSettings()">
+            <div class="stats-card">
+                <div class="stats-header"><div class="stats-day">👤 Profil</div></div>
+                <div class="input-group">
+                    <label class="input-label">Taille (cm)</label>
+                    <input type="number" class="input-field" id="setting-height" placeholder="175" onchange="updateProfile()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Poids objectif (kg)</label>
+                    <input type="number" class="input-field" id="setting-goal-weight" placeholder="75" onchange="updateProfile()">
+                </div>
             </div>
-            <div class="settings-item">
-                <span class="settings-label">Objectif eau (ml)</span>
-                <input type="number" class="input-number" id="goal-water" value="3000" onchange="updateSettings()">
+
+            <div class="stats-card">
+                <div class="stats-header"><div class="stats-day">🎯 Objectifs nutritionnels</div></div>
+                <div class="input-group">
+                    <label class="input-label">Calories quotidiennes</label>
+                    <input type="number" class="input-field" id="goal-calories" value="2200" onchange="updateSettings()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Protéines (g/jour)</label>
+                    <input type="number" class="input-field" id="goal-protein" value="180" onchange="updateSettings()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Eau (ml/jour)</label>
+                    <input type="number" class="input-field" id="goal-water" value="3000" onchange="updateSettings()">
+                </div>
+                <div class="coach-tip" style="margin-top:16px">
+                    <div class="coach-tip-title">💡 Calcul automatique</div>
+                    <div class="coach-tip-text">Basé sur ta taille et ton activité, tes besoins estimés sont : <span id="tdee-estimate">2200</span> cal/jour</div>
+                </div>
             </div>
-            <div class="settings-item">
-                <span class="settings-label">Objectif protéines (g)</span>
-                <input type="number" class="input-number" id="goal-protein" value="180" onchange="updateSettings()">
+
+            <div class="stats-card">
+                <div class="stats-header"><div class="stats-day">⚠️ Zone dangereuse</div></div>
+                <button class="btn-primary" onclick="exportData()" style="background:var(--bg-tertiary);margin-bottom:8px">📤 Sauvegarder données</button>
+                <button class="btn-primary" onclick="importData()" style="background:var(--bg-tertiary);margin-bottom:8px">📥 Restaurer données</button>
+                <button class="btn-primary" onclick="resetAllData()" style="background:var(--bg-tertiary);color:var(--accent)">🗑️ Tout effacer</button>
             </div>
-            <button class="btn-primary" onclick="resetAllData()" style="margin-top:20px;background:var(--bg-tertiary);color:var(--accent)">🗑️ Réinitialiser toutes les données</button>
         </div>
     </div>
 
@@ -328,27 +370,26 @@
     <div id="bilan-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Bilan de la journée</div>
+                <div class="modal-title">Bilan & Écarts</div>
                 <button class="modal-close" onclick="closeBilanModal()">×</button>
             </div>
             <div class="modal-body">
                 <div class="summary-box">
-                    <div class="summary-row"><div class="summary-label">Calories consommées</div><div class="summary-value" id="bilan-calories">0</div></div>
+                    <div class="summary-row"><div class="summary-label">Calories repas</div><div class="summary-value" id="bilan-calories">0</div></div>
                     <div class="summary-row"><div class="summary-label">Objectif</div><div class="summary-value" id="bilan-goal">2200</div></div>
                     <div class="summary-row"><div class="summary-label">Bilan actuel</div><div class="summary-value" id="bilan-actuel">0</div></div>
                 </div>
 
-                <h3 style="margin-bottom:16px;font-size:16px;">Ajouter les écarts :</h3>
+                <h3 style="margin-bottom:16px;font-size:16px;">Écarts de la journée :</h3>
                 <div class="deviation-grid" id="deviation-grid"></div>
 
                 <div class="summary-box">
                     <div class="summary-row"><div class="summary-label">Total écarts</div><div class="summary-value negative" id="total-ecarts">+0 cal</div></div>
-                    <div class="summary-row"><div class="summary-label">Protéines écarts</div><div class="summary-value protein" id="total-ecarts-prot">+0g</div></div>
                     <div class="summary-row"><div class="summary-label">Bilan final</div><div class="summary-value" id="bilan-final">0</div></div>
                 </div>
 
                 <div class="suggestion-box" id="suggestion-box" style="display:none;">
-                    <div class="suggestion-title">💡 Suggestion pour demain</div>
+                    <div class="suggestion-title">💡 Compensation demain</div>
                     <div class="suggestion-text" id="suggestion-text"></div>
                 </div>
 
@@ -362,15 +403,35 @@
     <div id="food-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title" id="food-modal-title">Ajouter un aliment</div>
+                <div class="modal-title" id="food-modal-title">Ajouter</div>
                 <button class="modal-close" onclick="closeFoodModal()">×</button>
             </div>
             <div class="modal-body">
-                <select class="select-food" id="food-select" size="10" style="height:auto;max-height:300px">
-                    <!-- Options générées dynamiquement -->
-                </select>
+                <select class="select-food" id="food-select" size="10" style="height:auto;max-height:300px"></select>
                 <button class="btn-primary" onclick="addSelectedFood()">Ajouter</button>
                 <button class="btn-secondary" onclick="closeFoodModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POIDS -->
+    <div id="weight-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Nouvelle pesée</div>
+                <button class="modal-close" onclick="closeWeightModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Poids (kg)</label>
+                    <input type="number" class="input-field" id="new-weight" placeholder="75.5" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Date</label>
+                    <input type="date" class="input-field" id="weight-date">
+                </div>
+                <button class="btn-primary" onclick="saveWeight()">Enregistrer</button>
+                <button class="btn-secondary" onclick="closeWeightModal()">Annuler</button>
             </div>
         </div>
     </div>
@@ -378,152 +439,288 @@
     <div class="bottom-nav">
         <div class="nav-item active" onclick="showPage('day')"><div class="nav-icon">📅</div><div class="nav-label">Jour</div></div>
         <div class="nav-item" onclick="showPage('week')"><div class="nav-icon">📊</div><div class="nav-label">Semaine</div></div>
-        <div class="nav-item" onclick="showPage('stats')"><div class="nav-icon">📈</div><div class="nav-label">Stats</div></div>
-        <div class="nav-item" onclick="showPage('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Réglages</div></div>
+        <div class="nav-item" onclick="showPage('stats')"><div class="nav-icon">📈</div><div class="nav-label">Progrès</div></div>
+        <div class="nav-item" onclick="showPage('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Profil</div></div>
     </div>
 
     <script>
-        // BASE DE DONNÉES ALIMENTS
+        // BASE DE DONNÉES COMPLÈTE
         const foodDatabase={
             starter:[
-                {id:'salade_verte',name:'Salade verte',cal:30,prot:2},
-                {id:'salade_cesar',name:'Salade César',cal:180,prot:8},
-                {id:'salade_nicoise',name:'Salade niçoise',cal:250,prot:15},
-                {id:'soupe_legumes',name:'Soupe de légumes',cal:80,prot:3},
-                {id:'soupe_poulet',name:'Soupe poulet/nouilles',cal:120,prot:8},
-                {id:'carottes_rapees',name:'Carottes râpées',cal:45,prot:1},
-                {id:'taboule',name:'Taboulé',cal:160,prot:4},
-                {id:'guacamole',name:'Guacamole (100g)',cal:150,prot:2},
-                {id:'houmous',name:'Houmous (100g)',cal:166,prot:8},
-                {id:'tomate_mozza',name:'Tomate-mozzarella',cal:200,prot:10},
-                {id:'ceviche',name:'Ceviche',cal:120,prot:20},
-                {id:'sashimi',name:'Sashimi (6 pièces)',cal:180,prot:24}
+                // Salades composées détaillées
+                {id:'salade_verte',name:'Salade verte simple',cal:30,prot:2},
+                {id:'salade_cesar',name:'Salade César (poulet, croûtons, parmesan)',cal:450,prot:35},
+                {id:'salade_nicoise',name:'Salade niçoise complète',cal:380,prot:25},
+                {id:'salade_mais_croute',name:'Salade maïs + croûtons + tomates',cal:280,prot:8},
+                {id:'salade_avocat_crevettes',name:'Salade avocat crevettes',cal:320,prot:22},
+                {id:'salade_chèvre_chaud',name:'Salade chèvre chaud',cal:380,prot:18},
+                {id:'salade_lentilles',name:'Salade de lentilles',cal:250,prot:12},
+                {id:'salade_quinoa_feta',name:'Salade quinoa feta',cal:320,prot:10},
+                {id:'salade_riz_thon',name:'Salade riz thon',cal:350,prot:20},
+                {id:'salade_pates_pesto',name:'Salade de pâtes pesto',cal:420,prot:12},
+                {id:'taboule_libanais',name:'Taboulé libanais',cal:180,prot:4},
+                {id:'fattoush',name:'Fattoush (salade libanaise)',cal:220,prot:6},
+                {id:'mezze_houmous',name:'Mezze houmous',cal:280,prot:10},
+                {id:'soupe_vermicelles',name:'Soupe vermicelles',cal:120,prot:4},
+                {id:'soupe_miso',name:'Soupe miso',cal:80,prot:6},
+                {id:'veloute_potiron',name:'Velouté de potiron',cal:150,prot:3},
+                {id:'gaspacho',name:'Gaspacho',cal:90,prot:2},
+                {id:'ceviche_saumon',name:'Ceviche de saumon',cal:200,prot:25},
+                {id:'tartare_saumon',name:'Tartare de saumon',cal:280,prot:22},
+                {id:'carpaccio_boeuf',name:'Carpaccio de bœuf',cal:250,prot:26}
             ],
             main:[
-                {id:'poulet_grille',name:'Poulet grillé (150g)',cal:300,prot:35},
-                {id:'poulet_roti',name:'Poulet rôti (200g)',cal:400,prot:45},
-                {id:'steak_hache',name:'Steak haché (150g)',cal:400,prot:35},
-                {id:'steak',name:'Steak boeuf (200g)',cal:500,prot:50},
-                {id:'saumon',name:'Saumon (150g)',cal:300,prot:35},
-                {id:'cabillaud',name:'Cabillaud (200g)',cal:180,prot:40},
-                {id:'thon',name:'Thon grillé (150g)',cal:220,prot:40},
-                {id:'omelette',name:'Omelette (3 œufs)',cal:280,prot:18},
-                {id:'oeufs_plat',name:'Œufs au plat (2)',cal:180,prot:12},
-                {id:'dinde',name:'Dinde rôtie (200g)',cal:350,prot:40},
-                {id:'agneau',name:'Agneau grillé (150g)',cal:450,prot:35},
-                {id:'canard',name:'Magret de canard (200g)',cal:400,prot:35},
-                {id:'pates_bolo',name:'Pâtes bolognaise',cal:550,prot:25},
-                {id:'pates_carbonara',name:'Pâtes carbonara',cal:600,prot:20},
-                {id:'riz_poulet',name:'Riz poulet curry',cal:500,prot:30},
-                {id:'ratatouille',name:'Ratatouille (300g)',cal:150,prot:4},
-                {id:'lasagne',name:'Lasagne (part)',cal:450,prot:25},
-                {id:'pizza_margherita',name:'Pizza Margherita (1/2)',cal:500,prot:20},
-                {id:'pizza_pepperoni',name:'Pizza Pepperoni (1/2)',cal:650,prot:25},
-                {id:'burger_maison',name:'Burger maison',cal:600,prot:35},
-                {id:'tacos',name:'Tacos poulet',cal:550,prot:30},
-                {id:'sushi_mix',name:'Sushi mix (12 pièces)',cal:450,prot:20},
-                {id:'bol_riz_saumon',name:'Bol riz-saumon',cal:500,prot:30},
-                {id:'quiche',name:'Quiche lorraine (part)',cal:400,prot:15}
+                // Viandes/Poissons
+                {id:'poulet_grille',name:'Poulet grillé (150g)',cal:280,prot:35},
+                {id:'poulet_roti',name:'Poulet rôti (200g)',cal:380,prot:45},
+                {id:'poulet_curry',name:'Poulet au curry',cal:420,prot:38},
+                {id:'poulet_tandoori',name:'Poulet tandoori',cal:350,prot:35},
+                {id:'escalope_dinde',name:'Escalope de dinde (150g)',cal:250,prot:40},
+                {id:'dinde_rotie',name:'Dinde rôtie (200g)',cal:320,prot:45},
+                {id:'roti_boeuf',name:'Rôti de bœuf (200g)',cal:450,prot:50},
+                {id:'steak_hache_5',name:'Steak haché 5% (150g)',cal:330,prot:40},
+                {id:'steak_hache_15',name:'Steak haché 15% (150g)',cal:420,prot:38},
+                {id:'entrecote',name:'Entrecôte (250g)',cal:650,prot:55},
+                {id:'cote_agneau',name:'Côte d\'agneau (200g)',cal:520,prot:35},
+                {id:'gigot_agneau',name:'Gigot d\'agneau (200g)',cal:480,prot:38},
+                {id:'cuissard_canard',name:'Cuisse de canard (200g)',cal:450,prot:35},
+                {id:'magret_canard',name:'Magret de canard (200g)',cal:420,prot:38},
+                {id:'jambon_veau',name:'Jambon de veau (150g)',cal:300,prot:32},
+                {id:'roti_porc',name:'Rôti de porc (200g)',cal:480,prot:40},
+                {id:'cotes_porc',name:'Côtes de porc (200g)',cal:520,prot:38},
+                {id:'saucisse_toulouse',name:'Saucisse de Toulouse',cal:380,prot:18},
+                {id:'merguez',name:'Merguez (2)',cal:320,prot:16},
+                {id:'chipolatas',name:'Chipolatas (2)',cal:280,prot:14},
+                
+                // Poissons
+                {id:'saumon_grille',name:'Saumon grillé (180g)',cal:370,prot:40},
+                {id:'saumon_papillote',name:'Saumon en papillote',cal:350,prot:38},
+                {id:'cabillaud_papillote',name:'Cabillaud papillote',cal:220,prot:45},
+                {id:'filet_lieu',name:'Filet de lieu (200g)',cal:200,prot:38},
+                {id:'colin_morue',name:'Colin morue (200g)',cal:180,prot:40},
+                {id:'dorade_royale',name:'Dorade royale (200g)',cal:280,prot:35},
+                {id:'bar_vapeur',name:'Bar vapeur (200g)',cal:260,prot:38},
+                {id:'maquereau_grille',name:'Maquereau grillé (200g)',cal:380,prot:35},
+                {id:'sardines_grillees',name:'Sardines grillées (200g)',cal:320,prot:30},
+                {id:'thon_rouge',name:'Thon rouge grillé (150g)',cal:280,prot:40},
+                {id:'thon_conserve',name:'Thon en conserve (150g)',cal:220,prot:35},
+                {id:'truite_amandine',name:'Truite amandine',cal:420,prot:35},
+                
+                // Œufs/Légumes
+                {id:'omelette_jambon',name:'Omelette jambon/fromage',cal:450,prot:28},
+                {id:'omelette_champignons',name:'Omelette champignons',cal:380,prot:22},
+                {id:'oeufs_cocotte',name:'Œufs cocotte',cal:320,prot:18},
+                {id:'shakshuka',name:'Shakshuka (2 œufs)',cal:380,prot:20},
+                {id:'ratatouille_gratinee',name:'Ratatouille gratinée',cal:280,prot:8},
+                {id:'gratin_dauphinois',name:'Gratin dauphinois',cal:450,prot:15},
+                {id:'tian_legumes',name:'Tian de légumes',cal:220,prot:6},
+                {id:'lasagne_vege',name:'Lasagne végétarienne',cal:480,prot:18},
+                {id:'chili_con_carne',name:'Chili con carne',cal:520,prot:32},
+                {id:'moussaka',name:'Moussaka',cal:480,prot:25},
+                
+                // Accompagnements féculents (NOUVEAU)
+                {id:'riz_blanc_cuit',name:'Riz blanc cuit (150g)',cal:195,prot:4},
+                {id:'riz_complet_cuit',name:'Riz complet cuit (150g)',cal:210,prot:5},
+                {id:'riz_basmati_cuit',name:'Riz basmati cuit (150g)',cal:200,prot:4},
+                {id:'pates_cuites',name:'Pâtes cuites (200g)',cal:260,prot:9},
+                {id:'pates_completes',name:'Pâtes complètes (200g)',cal:248,prot:10},
+                {id:'quinoa_cuit',name:'Quinoa cuit (150g)',cal:222,prot:8},
+                {id:'boulgour_cuit',name:'Boulgour cuit (150g)',cal:165,prot:6},
+                {id:'semoule_couscous',name:'Semoule de couscous (200g)',cal:240,prot:8},
+                {id:'polenta_cuite',name:'Polenta cuite (200g)',cal:170,prot:4},
+                {id:'pommes_terre_vapeur',name:'Pommes de terre vapeur (200g)',cal:140,prot:3},
+                {id:'puree_pdt',name:'Purée de pommes de terre',cal:200,prot:4},
+                {id:'gratin_pdt',name:'Gratin de pommes de terre',cal:380,prot:12},
+                {id:'frites',name:'Frites (150g)',cal:450,prot:5},
+                {id:'potatoes',name:'Potatoes (200g)',cal:520,prot:6},
+                {id:'patate_douce',name:'Patate douce rôtie (200g)',cal:180,prot:3},
+                {id:'haricots_verts',name:'Haricots verts (200g)',cal:70,prot:4},
+                {id:'petits_pois',name:'Petits pois (150g)',cal:120,prot:8},
+                {id:'carottes_glacées',name:'Carottes glacées (200g)',cal:90,prot:2},
+                {id:'epinards_frais',name:'Épinards frais (200g)',cal:50,prot:5},
+                {id:'chou_fleur',name:'Chou-fleur (200g)',cal:50,prot:4},
+                {id:'brocolis',name:'Brocolis vapeur (200g)',cal:70,prot:6},
+                {id:'courgettes_grillees',name:'Courgettes grillées (200g)',cal:60,prot:3},
+                {id:'poivrons_grilles',name:'Poivrons grillés (150g)',cal:45,prot:2},
+                {id:'aubergines_grillees',name:'Aubergines grillées (200g)',cal:70,prot:2},
+                {id:'salade_verte_accomp',name:'Salade verte en accompagnement',cal:30,prot:2},
+                {id:'tomates_mozza',name:'Tomates mozzarella',cal:280,prot:14},
+                {id:'champignons_sautes',name:'Champignons sautés (150g)',cal:80,prot:5},
+                {id:'oignons_caramelises',name:'Oignons caramélisés (100g)',cal:120,prot:1},
+                {id:'lentilles_cuites',name:'Lentilles vertes cuites (150g)',cal:165,prot:12},
+                {id:'pois_chiches',name:'Pois chiches cuits (150g)',cal:180,prot:9},
+                {id:'haricots_rouges',name:'Haricots rouges (150g)',cal:190,prot:10},
+                {id:'falafels',name:'Falafels (4)',cal:320,prot:12},
+                {id:'gnocchis',name:'Gnocchis (200g)',cal:280,prot:6},
+                {id:'spaetzle',name:'Spaetzle (200g)',cal:310,prot:8}
             ],
             dessert:[
-                {id:'yaourt_nature',name:'Yaourt nature (125g)',cal:60,prot:4},
-                {id:'yaourt_grec',name:'Yaourt grec (150g)',cal:120,prot:10},
-                {id:'skyr',name:'Skyr nature (150g)',cal:90,prot:15},
-                {id:'skyr_fruit',name:'Skyr aux fruits',cal:140,prot:15},
-                {id:'fromage_blanc',name:'Fromage blanc',cal:80,prot:6},
-                {id:'petit_suisse',name:'Petit-Suisse (2)',cal:120,prot:8},
-                {id:'mousse_choco',name:'Mousse au chocolat',cal:250,prot:4},
-                {id:'creme_dessert',name:'Crème dessert',cal:180,prot:3},
-                {id:'flan',name:'Flan (part)',cal:200,prot:6},
-                {id:'tarte_pommes',name:'Tarte aux pommes',cal:300,prot:4},
-                {id:'gateau_choco',name:'Gâteau au chocolat',cal:350,prot:5},
-                {id:'brownie',name:'Brownie',cal:400,prot:6},
-                {id:'tiramisu',name:'Tiramisu',cal:350,prot:6},
-                {id:'creme_brulee',name:'Crème brûlée',cal:280,prot:4},
-                {id:'ile_flottante',name:'Île flottante',cal:220,prot:5},
-                {id:'fruit_frais',name:'Fruit frais (1)',cal:80,prot:1},
-                {id:'salade_fruits',name:'Salade de fruits',cal:120,prot:2},
-                {id:'compote',name:'Compote (sans sucre)',cal:70,prot:0},
-                {id:'banane',name:'Banane',cal:90,prot:1},
-                {id:'pomme',name:'Pomme',cal:60,prot:0},
-                {id:'orange',name:'Orange',cal:65,prot:1},
-                {id:'raisin',name:'Raisin (150g)',cal:100,prot:1},
-                {id:'barre_cereale',name:'Barre céréale',cal:120,prot:2},
-                {id:'cookie',name:'Cookie',cal:150,prot:2},
-                {id:'muffin',name:'Muffin',cal:280,prot:4},
-                {id:'donut',name:'Donut',cal:320,prot:4},
-                {id:'glace_vanille',name:'Glace vanille (2 boules)',cal:200,prot:4},
-                {id:'sorbet',name:'Sorbet (2 boules)',cal:150,prot:0},
-                {id:'tarte_citron',name:'Tarte au citron',cal:320,prot:4},
-                {id:'eclair',name:'Éclair',cal:280,prot:4},
-                {id:'religieuse',name:'Religieuse',cal:350,prot:6},
-                {id:'profiteroles',name:'Profiteroles',cal:380,prot:6},
-                {id:'crumble',name:'Crumble fruits',cal:300,prot:4},
-                {id:'charlotte',name:'Charlotte',cal:280,prot:4},
-                {id:'baba_rhum',name:'Baba au rhum',cal:320,prot:4},
-                {id:'savarin',name:'Savarin',cal:300,prot:5},
-                {id:'tarte_tatin',name:'Tarte Tatin',cal:320,prot:3},
-                {id:'kouign_amann',name:'Kouign-amann',cal:400,prot:6},
-                {id:'pain_chocolat',name:'Pain au chocolat',cal:280,prot:5},
-                {id:'croissant',name:'Croissant',cal:230,prot:4},
-                {id:'chouquette',name:'Chouquettes (3)',cal:150,prot:3},
-                {id:'madeleine',name:'Madeleines (2)',cal:180,prot:3},
-                {id:'financier',name:'Financiers (2)',cal:200,prot:4},
-                {id:'macaron',name:'Macarons (2)',cal:160,prot:2},
-                {id:'meringue',name:'Meringues (2)',cal:120,prot:1},
-                {id:'panna_cotta',name:'Panna cotta',cal:200,prot:3},
-                {id:'riz_lait',name:'Riz au lait',cal:250,prot:5},
-                {id:'semoule',name:'Semoule au lait',cal:220,prot:5}
+                // Fruits frais (NOUVEAU)
+                {id:'fraise_fraiche',name:'Fraises fraîches (200g)',cal:64,prot:1},
+                {id:'framboises',name:'Framboises (150g)',cal:78,prot:2},
+                {id:'myrtilles',name:'Myrtilles (150g)',cal:86,prot:1},
+                {id:'mures',name:'Mûres (150g)',cal:72,prot:2},
+                {id:'cerises',name:'Cerises (200g)',cal:126,prot:2},
+                {id:'peche_fraiche',name:'Pêche fraîche (1)',cal:58,prot:1},
+                {id:'nectarine',name:'Nectarine (1)',cal:60,prot:1},
+                {id:'abricot',name:'Abricot (3)',cal:72,prot:2},
+                {id:'prune',name:'Prune (3)',cal:90,prot:1},
+                {id:'poire_fraiche',name:'Poire fraîche (1)',cal:80,prot:0},
+                {id:'pomme_fraiche',name:'Pomme fraîche (1)',cal:80,prot:0},
+                {id:'pomme_verte',name:'Pomme verte (1)',cal:72,prot:0},
+                {id:'kiwi',name:'Kiwi (2)',cal:84,prot:2},
+                {id:'orange_fraiche',name:'Orange fraîche (1)',cal:65,prot:1},
+                {id:'pamplemousse',name:'Pamplemousse (1/2)',cal:52,prot:1},
+                {id:'mandarine',name:'Mandarine (2)',cal:86,prot:1},
+                {id:'clementine',name:'Clémentine (2)',cal:94,prot:1},
+                {id:'ananas_frais',name:'Ananas frais (150g)',cal:75,prot:1},
+                {id:'mangue',name:'Mangue (1/2)',cal:100,prot:1},
+                {id:'papaye',name:'Papaye (150g)',cal:62,prot:1},
+                {id:'pasteque',name:'Pastèque (300g)',cal:90,prot:2},
+                {id:'melon',name:'Melon (1/4)',cal:68,prot:1},
+                {id:'raisin_frais',name:'Raisin frais (150g)',cal:104,prot:1},
+                {id:'figue_fraiche',name:'Figue fraîche (2)',cal:74,prot:1},
+                {id:'grenade',name:'Grenade (1/2)',cal:120,prot:2},
+                {id:'litchi',name:'Litchis (10)',cal:66,prot:1},
+                {id:'fruit_salad',name:'Salade de fruits maison (200g)',cal:110,prot:1},
+                
+                // Laitages
+                {id:'yaourt_nature',name:'Yaourt nature (125g)',cal:65,prot:5},
+                {id:'yaourt_grec',name:'Yaourt grec nature (150g)',cal:130,prot:10},
+                {id:'yaourt_brasse',name:'Yaourt brassé (125g)',cal:110,prot:4},
+                {id:'skyr_nature',name:'Skyr 0% (150g)',cal:90,prot:15},
+                {id:'skyr_fruit',name:'Skyr aux fruits (150g)',cal:140,prot:15},
+                {id:'fromage_blanc_0',name:'Fromage blanc 0% (150g)',cal:105,prot:14},
+                {id:'fromage_blanc_40',name:'Fromage blanc 40% (150g)',cal:165,prot:10},
+                {id:'petit_suisse',name:'Petit-Suisse nature (2)',cal:120,prot:8},
+                {id:'faisselle',name:'Faisselle (150g)',cal:90,prot:12},
+                {id:'mousse_choco',name:'Mousse au chocolat',cal:180,prot:4},
+                {id:'mousse_cafe',name:'Mousse au café',cal:160,prot:4},
+                {id:'creme_dessert_vanille',name:'Crème dessert vanille',cal:180,prot:3},
+                {id:'crème_chocolat',name:'Crème dessert chocolat',cal:190,prot:3},
+                {id:'flan_vanille',name:'Flan vanille',cal:200,prot:6},
+                {id:'flan_caramel',name:'Flan caramel',cal:220,prot:6},
+                {id:'riz_lait_vanille',name:'Riz au lait vanille',cal:220,prot:5},
+                {id:'riz_lait_caramel',name:'Riz au lait caramel',cal:260,prot:5},
+                {id:'semoule_vanille',name:'Semoule vanille',cal:200,prot:5},
+                {id:'panna_cotta',name:'Panna cotta',cal:280,prot:4},
+                {id:'panna_cotta_fruits',name:'Panna cotta fruits rouges',cal:320,prot:4},
+                {id:'ile_flottante',name:'Île flottante',cal:240,prot:6},
+                {id:'oeufs_neige',name:'Œufs à la neige',cal:220,profit:6},
+                {id:'creme_brulee',name:'Crème brûlée',cal:320,prot:5},
+                {id:'crème_catalane',name:'Crème catalane',cal:340,prot:6},
+                
+                // Pâtisseries
+                {id:'tarte_pommes',name:'Tarte aux pommes (part)',cal:280,prot:3},
+                {id:'tarte_prunes',name:'Tarte aux prunes (part)',cal:300,prot:3},
+                {id:'tarte_citron_meringuee',name:'Tarte citron meringuée',cal:350,prot:4},
+                {id:'tarte_chocolat',name:'Tarte au chocolat',cal:420,prot:6},
+                {id:'tarte_fraise',name:'Tarte aux fraises',cal:320,prot:4},
+                {id:'gateau_chocolat',name:'Gâteau au chocolat (part)',cal:380,prot:6},
+                {id:'gateau_yaourt',name:'Gâteau au yaourt (part)',cal:320,prot:5},
+                {id:'gateau_marbre',name:'Gâteau marbré (part)',cal:340,prot:5},
+                {id:'brownie',name:'Brownie (part)',cal:420,prot:6},
+                {id:'fondant_chocolat',name:'Fondant au chocolat',cal:450,prot:7},
+                {id:'moelleux_chocolat',name:'Moelleux au chocolat',cal:380,prot:6},
+                {id:'tiramisu',name:'Tiramisu (part)',cal:450,prot:8},
+                {id:'tiramisu_fraise',name:'Tiramisu fraise',cal:420,prot:7},
+                {id:'profiteroles',name:'Profiteroles (3)',cal:480,prot:8},
+                {id:'religieuse',name:'Religieuse',cal:420,prot:7},
+                {id:'eclair_chocolat',name:'Éclair au chocolat',cal:380,prot:6},
+                {id:'eclair_cafe',name:'Éclair au café',cal:360,prot:6},
+                {id:'mille_feuille',name:'Mille-feuille',cal:450,prot:7},
+                {id:'paris_brest',name:'Paris-Brest',cal:520,prot:9},
+                {id:'saint_honore',name:'Saint-Honoré',cal:480,prot:8},
+                {id:'opera',name:'Opéra',cal:450,prot:7},
+                {id:'foret_noire',name:'Forêt-noire',cal:480,prot:7},
+                {id:'fraisier',name:'Fraisier',cal:420,prot:8},
+                {id:'charlotte_fraise',name:'Charlotte aux fraises',cal:380,prot:6},
+                {id:'charlotte_chocolat',name:'Charlotte au chocolat',cal:420,prot:7},
+                {id:'baba_au_rhum',name:'Baba au rhum',cal:380,prot:5},
+                {id:'savarin',name:'Savarin',cal:360,prot:6},
+                {id:'tarte_tatin',name:'Tarte Tatin',cal:340,prot:4},
+                {id:'kouign_amann',name:'Kouign-amann',cal:480,prot:8},
+                {id:'pain_chocolat',name:'Pain au chocolat',cal:290,prot:5},
+                {id:'croissant_beurre',name:'Croissant beurre',cal:240,prot:4},
+                {id:'croissant_amandes',name:'Croissant aux amandes',cal:380,prot:7},
+                {id:'chouquette',name:'Chouquettes (3)',cal:180,prot:3},
+                {id:'madeleine',name:'Madeleines (2)',cal:190,prot:3},
+                {id:'financier',name:'Financiers (2)',cal:220,prot:4},
+                {id:'macaron',name:'Macarons (2)',cal:180,prot:2},
+                {id:'meringue',name:'Meringues (2)',cal:130,prot:1},
+                {id:'tuile_amande',name:'Tuiles aux amandes (3)',cal:210,prot:3},
+                {id:'cigarette_russes',name:'Cigarettes russes (2)',cal:180,prot:2},
+                {id:'palets_bretons',name:'Palets bretons (2)',cal:220,prot:3},
+                {id:'sables_vanille',name:'Sablés vanille (3)',cal:190,prot:2},
+                {id:'cookies_choco',name:'Cookies chocolat (2)',cal:220,prot:3},
+                {id:'muffin_myrtille',name:'Muffin myrtille',cal:320,prot:5},
+                {id:'muffin_chocolat',name:'Muffin chocolat',cal:380,prot:6},
+                {id:'donut_sucre',name:'Donut sucre',cal:340,prot:4},
+                {id:'donut_chocolat',name:'Donut chocolat',cal:380,prot:5},
+                {id:'beignet_four',name:'Beignet au four',cal:280,prot:4},
+                {id:'beignet_frite',name:'Beignet frit',cal:420,prot:5},
+                {id:'bugnes',name:'Bugnes (3)',cal:320,prot:4},
+                {id:'churros',name:'Churros (3)',cal:280,prot:3},
+                
+                // Glaces
+                {id:'glace_vanille_2',name:'Glace vanille (2 boules)',cal:220,prot:4},
+                {id:'glace_chocolat_2',name:'Glace chocolat (2 boules)',cal:240,prot:5},
+                {id:'glace_fraise_2',name:'Glace fraise (2 boules)',cal:200,prot:3},
+                {id:'glace_menthe_2',name:'Glace menthe (2 boules)',cal:210,prot:3},
+                {id:'glace_caramel_2',name:'Glace caramel (2 boules)',cal:260,prot:4},
+                {id:'glace_cafe_2',name:'Glace café (2 boules)',cal:220,prot:4},
+                {id:'glace_noisette_2',name:'Glace noisette (2 boules)',cal:280,prot:5},
+                {id:'glace_pistache_2',name:'Glace pistache (2 boules)',cal:290,prot:5},
+                {id:'sorbet_citron_2',name:'Sorbet citron (2 boules)',cal:120,prot:0},
+                {id:'sorbet_fraise_2',name:'Sorbet fraise (2 boules)',cal:140,prot:0},
+                {id:'sorbet_mangue_2',name:'Sorbet mangue (2 boules)',cal:160,prot:0},
+                {id:'sundae_caramel',name:'Sundae caramel',cal:450,prot:8},
+                {id:'sundae_chocolat',name:'Sundae chocolat',cal:480,prot:9},
+                {id:'milkshake_vanille',name:'Milkshake vanille',cal:380,prot:8},
+                {id:'milkshake_chocolat',name:'Milkshake chocolat',cal:420,prot:10},
+                
+                // Autres
+                {id:'compote_pomme',name:'Compote de pomme ss sucre',cal:80,prot:0},
+                {id:'compote_poire',name:'Compote de poire',cal:90,prot:0},
+                {id:'compote_fruits',name:'Compote fruits mixés',cal:100,prot:1},
+                {id:'puree_marrons',name:'Purée de marrons',cal:220,prot:2},
+                {id:'creme_marrons',name:'Crème de marrons',cal:280,prot:2},
+                {id:'confiture',name:'Confiture (2 càs)',cal:100,prot:0},
+                {id:'miel',name:'Miel (2 càs)',cal:120,prot:0},
+                {id:'nutella',name:'Nutella (2 càs)',cal:200,prot:3},
+                {id:'speculoos',name:'Spéculoos (3)',cal:180,prot:2},
+                {id:'barre_chocolatee',name:'Barre chocolatée',cal:250,prot:3},
+                {id:'barre_cereale',name:'Barre de céréale',cal:140,prot:3},
+                {id:'barre_proteinee',name:'Barre protéinée',cal:200,prot:20},
+                {id:'pudding_choco',name:'Pudding chocolat',cal:190,prot:4},
+                {id:'pudding_vanille',name:'Pudding vanille',cal:170,prot:3},
+                {id:'danette_choco',name:'Danette chocolat',cal:160,prot:4},
+                {id:'danette_vanille',name:'Danette vanille',cal:150,prot:4},
+                {id:'petit_gervais',name:'Petit Gervais fruit',cal:100,prot:4},
+                {id:'actimel',name:'Actimel',cal:70,prot:3},
+                {id:'danonino',name:'Danonino',cal:60,prot:3}
             ]
         };
 
-        // ÉCARTS (inchangé)
+        // Écarts (simplifié)
         const ecartsList=[
             {id:'gateau_choco',name:'🍰 Gâteau chocolat',cal:350,prot:5,category:'Dessert'},
-            {id:'tarte',name:'🥧 Tarte/crumble',cal:300,prot:4,category:'Dessert'},
-            {id:'glace',name:'🍨 Glace 2 boules',cal:200,prot:3,category:'Dessert'},
-            {id:'mousse',name:'🍫 Mousse au chocolat',cal:250,prot:4,category:'Dessert'},
-            {id:'yaourt_fruite',name:'🥣 Yaourt fruité sucré',cal:180,prot:5,category:'Dessert'},
-            {id:'barre_choco',name:'🍫 Barre chocolatée',cal:250,prot:3,category:'Dessert'},
-            {id:'cookies',name:'🍪 Cookies (2-3)',cal:200,prot:3,category:'Dessert'},
-            {id:'pain_perdu',name:'🥞 Pain perdu/crêpe',cal:350,prot:6,category:'Dessert'},
-            {id:'burger',name:'🍔 Burger classique',cal:500,prot:25,category:'Fast-food'},
-            {id:'burger_double',name:'🍔 Burger double',cal:700,prot:35,category:'Fast-food'},
             {id:'pizza',name:'🍕 Pizza (2 parts)',cal:600,prot:20,category:'Fast-food'},
-            {id:'kebab',name:'🥙 Kebab/falafel',cal:650,prot:25,category:'Fast-food'},
-            {id:'tacos',name:'🌮 Tacos',cal:550,prot:22,category:'Fast-food'},
-            {id:'sushi',name:'🍣 Sushi (6-8 pièces)',cal:450,prot:15,category:'Fast-food'},
-            {id:'pates',name:'🍝 Pâtes bolo/carbonara',cal:550,prot:18,category:'Fast-food'},
-            {id:'chips',name:'🥜 Chips (sachet 50g)',cal:270,prot:3,category:'Grignotage'},
-            {id:'biscuits_apero',name:'🍘 Biscuits apéro',cal:200,prot:2,category:'Grignotage'},
-            {id:'noix',name:'🥜 Noix/cacahuètes',cal:300,prot:8,category:'Grignotage'},
-            {id:'popcorn',name:'🍿 Pop-corn',cal:150,prot:2,category:'Grignotage'},
-            {id:'barre_cereales',name:'🥣 Barre de céréales',cal:180,prot:4,category:'Grignotage'},
-            {id:'fruits_secs',name:'🍇 Fruits secs',cal:200,prot:3,category:'Grignotage'},
-            {id:'biere_25',name:'🍺 Bière (25cl)',cal:110,prot:1,category:'Boisson'},
-            {id:'biere_50',name:'🍺 Bière (50cl)',cal:220,prot:2,category:'Boisson'},
-            {id:'vin',name:'🍷 Verre de vin (15cl)',cal:140,prot:0,category:'Boisson'},
-            {id:'soda',name:'🥤 Soda (33cl)',cal:140,prot:0,category:'Boisson'},
-            {id:'jus_fruit',name:'🧃 Jus de fruit (25cl)',cal:110,prot:1,category:'Boisson'},
-            {id:'cafe_gourmand',name:'☕ Café gourmand',cal:300,prot:4,category:'Boisson'},
-            {id:'portion_pates',name:'🍚 2ème portion pâtes/riz',cal:200,prot:4,category:'Excès'},
-            {id:'viande_plus',name:'🥩 Viande en + (100g)',cal:250,prot:25,category:'Excès'},
-            {id:'pain_plus',name:'🍞 Pain en + (2 tranches)',cal:150,prot:4,category:'Excès'},
-            {id:'fromage_plus',name:'🧀 Fromage en + (50g)',cal:200,prot:8,category:'Excès'}
+            {id:'burger',name:'🍔 Burger',cal:550,prot:25,category:'Fast-food'},
+            {id:'frites',name:'🍟 Frites (portion)',cal:400,prot:5,category:'Fast-food'},
+            {id:'chips',name:'🥜 Chips (sachet)',cal:270,prot:3,category:'Grignotage'},
+            {id:'biere',name:'🍺 Bière (50cl)',cal:220,prot:2,category:'Boisson'},
+            {id:'vin',name:'🍷 Vin (2 verres)',cal:280,prot:0,category:'Boisson'},
+            {id:'soda',name:'🥤 Soda (50cl)',cal:210,prot:0,category:'Boisson'},
+            {id:'portion_plus',name:'🍚 2ème portion',cal:250,prot:4,category:'Excès'},
+            {id:'aperitif',name:'🥜 Apéritif (mix)',cal:400,prot:8,category:'Grignotage'}
         ];
 
         const PROGRAM=[{type:'SÉANCE A',workout:true},{type:'REPOS',workout:false},{type:'SÉANCE B',workout:true},{type:'REPOS',workout:false},{type:'SÉANCE A+',workout:true},{type:'REPOS',workout:false},{type:'REPOS',workout:false}];
 
-        let currentDate=new Date(),selectedDate=new Date(),dayData={},waterGoal=3000,calorieGoal=2200,proteinGoal=180;
+        let currentDate=new Date(),selectedDate=new Date(),dayData={},waterGoal=3000,calorieGoal=2200,proteinGoal=180,userHeight=175,userWeight=80,goalWeight=75,weightHistory=[];
         const WATER_CUPS=12;
         let currentFoodSelection={meal:'',type:''};
-
-        // Repas fixes (petit-déj, goûter, etc.)
-        const fixedMeals={
-            breakfast:{time:'6h40',title:'Petit-déjeuner',items:[{name:'Prozis Oatmeal Chocolate Brownie',cal:250,prot:20},{name:'Skyr nature (150g)',cal:90,prot:15},{name:'Flocons avoine (30g)',cal:110,prot:4},{name:'Beurre cacahuètes (1càs)',cal:100,prot:4}],totalCal:550,totalProt:43},
-            coffee:{time:'9h30',title:'Café',items:[],totalCal:0,totalProt:0},
-            snack:{time:'16h30',title:'Goûter',items:[{name:'Muffins Prozis (1-2)',cal:200,prot:10}],totalCal:200,totalProt:10}
-        };
 
         function formatDateKey(date){return date.toISOString().split('T')[0]}
         function getDayName(date){const days=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];return days[date.getDay()]}
@@ -538,7 +735,6 @@
             if(!dayData[key]){
                 dayData[key]={meals:{},validated:false,ecarts:[],water:0,customLunch:{starter:[],main:[],dessert:[]},customDinner:{starter:[],main:[],dessert:[]}};
             }
-            // Migration pour les anciennes données sans custom meals
             if(!dayData[key].customLunch)dayData[key].customLunch={starter:[],main:[],dessert:[]};
             if(!dayData[key].customDinner)dayData[key].customDinner={starter:[],main:[],dessert:[]};
             return dayData[key];
@@ -550,16 +746,25 @@
                 if(saved){
                     const parsed=JSON.parse(saved);
                     dayData=parsed.dayData||{};
+                    weightHistory=parsed.weightHistory||[];
                     if(parsed.settings){
                         calorieGoal=parsed.settings.calorieGoal||2200;
                         waterGoal=parsed.settings.waterGoal||3000;
                         proteinGoal=parsed.settings.proteinGoal||180;
-                        document.getElementById('goal-calories').value=calorieGoal;
-                        document.getElementById('goal-water').value=waterGoal;
-                        document.getElementById('goal-protein').value=proteinGoal;
+                        userHeight=parsed.settings.userHeight||175;
+                        userWeight=parsed.settings.userWeight||80;
+                        goalWeight=parsed.settings.goalWeight||75;
                     }
                 }
             }catch(e){console.warn('Stockage non disponible');}
+            
+            // Appliquer les valeurs aux inputs
+            document.getElementById('goal-calories').value=calorieGoal;
+            document.getElementById('goal-water').value=waterGoal;
+            document.getElementById('goal-protein').value=proteinGoal;
+            document.getElementById('setting-height').value=userHeight;
+            document.getElementById('setting-goal-weight').value=goalWeight;
+            
             updateAll();
             setupEventListeners();
         }
@@ -568,7 +773,8 @@
             try{
                 localStorage.setItem('planningSportNutrition',JSON.stringify({
                     dayData,
-                    settings:{calorieGoal,waterGoal,proteinGoal}
+                    weightHistory,
+                    settings:{calorieGoal,waterGoal,proteinGoal,userHeight,userWeight,goalWeight}
                 }));
             }catch(e){console.warn('Sauvegarde impossible');}
         }
@@ -594,32 +800,62 @@
             updateDayPage();
             updateWeekPage();
             updateStatsPage();
+            updateStreak();
         }
 
         function showPage(page){
             document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
             
-            if(page==='day'){
-                document.getElementById('day-page').classList.add('active');
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-                document.getElementById('page-title').textContent='Planning Sport/Nutrition';
-            }else if(page==='week'){
-                document.getElementById('week-page').classList.add('active');
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-                document.getElementById('page-title').textContent='Vue Semaine';
-            }else if(page==='stats'){
-                document.getElementById('stats-page').classList.add('active');
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
-                document.getElementById('page-title').textContent='Statistiques';
-            }else if(page==='settings'){
-                document.getElementById('settings-page').classList.add('active');
-                document.querySelectorAll('.nav-item')[3].classList.add('active');
-                document.getElementById('page-title').textContent='Paramètres';
+            const pages=['day','week','stats','settings'];
+            const titles=['Coach Nutrition','Vue Semaine','Progrès','Profil'];
+            const icons=['📅','📊','📈','⚙️'];
+            
+            const idx=pages.indexOf(page);
+            if(idx>=0){
+                document.getElementById(`${page}-page`).classList.add('active');
+                document.querySelectorAll('.nav-item')[idx].classList.add('active');
+                document.getElementById('page-title').textContent=titles[idx];
             }
         }
 
-        // PAGE JOUR
+        // SÉRIE (STREAK)
+        function updateStreak(){
+            let streak=0;
+            let checkDate=new Date();
+            // Chercher la série en cours
+            while(true){
+                const key=formatDateKey(checkDate);
+                if(dayData[key]?.validated){
+                    streak++;
+                    checkDate=addDays(checkDate,-1);
+                }else{
+                    break;
+                }
+            }
+            // Vérifier hier si aujourd'hui pas encore validé
+            const todayKey=formatDateKey(new Date());
+            if(!dayData[todayKey]?.validated){
+                const yesterday=addDays(new Date(),-1);
+                const yestKey=formatDateKey(yesterday);
+                if(dayData[yestKey]?.validated){
+                    // Compter depuis le début de la série
+                    streak=1;
+                    let check=yesterday;
+                    while(true){
+                        check=addDays(check,-1);
+                        const k=formatDateKey(check);
+                        if(dayData[k]?.validated) streak++;
+                        else break;
+                    }
+                }else{
+                    streak=0;
+                }
+            }
+            document.getElementById('streak-badge').textContent=`${streak} jour${streak>1?'s':''} 🔥`;
+        }
+
+        // PAGE JOUR - TIMELINE CHRONOLOGIQUE
         function updateDayPage(){
             const weekStart=getWeekStart(selectedDate);
             const weekEnd=addDays(weekStart,6);
@@ -655,68 +891,109 @@
             document.getElementById('header-date').textContent=selectedDate.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 
             const validateBtn=document.getElementById('validate-day');
-            validateBtn.textContent=data.validated?'Validé ✓':'Valider';
+            validateBtn.textContent=data.validated?'✓ Validé':'Valider';
             validateBtn.className=`validate-btn ${data.validated?'validated':''}`;
 
-            // Timeline repas fixes + workout
+            // TIMELINE CHRONOLOGIQUE COMPLÈTE
             const timeline=document.getElementById('timeline-list');
             timeline.innerHTML='';
             
             let totalCal=0,totalProt=0,mealsChecked=0;
             
-            // Petit-déj
-            addFixedMealToTimeline(timeline,'breakfast',data,()=>{totalCal+=550;totalProt+=43;mealsChecked++;});
-            // Café
-            addFixedMealToTimeline(timeline,'coffee',data,()=>{mealsChecked++;});
+            // 1. PETIT-DÉJEUNER (6h40)
+            const petitDej={time:'6h40',title:'🌅 Petit-déjeuner',cal:550,prot:43,items:['Prozis Oatmeal (250cal)','Skyr nature (90cal)','Flocons avoine (110cal)','Beurre cacahuètes (100cal)']};
+            const pdChecked=data.meals.breakfast?.checked||false;
+            addTimelineItem(timeline,petitDej.time,petitDej.title,petitDej.items,petitDej.cal,petitDej.prot,pdChecked,()=>{
+                if(!data.meals.breakfast)data.meals.breakfast={};
+                data.meals.breakfast.checked=!data.meals.breakfast.checked;
+                saveData();updateAll();
+            });
+            if(pdChecked){totalCal+=petitDej.cal;totalProt+=petitDej.prot;mealsChecked++;}
             
-            // Déjeuner (custom)
+            // 2. CAFÉ (9h30)
+            const cafe={time:'9h30',title:'☕ Café',cal:0,prot:0,items:['Café/thé noir']};
+            const cafeChecked=data.meals.coffee?.checked||false;
+            addTimelineItem(timeline,cafe.time,cafe.title,cafe.items,cafe.cal,cafe.prot,cafeChecked,()=>{
+                if(!data.meals.coffee)data.meals.coffee={};
+                data.meals.coffee.checked=!data.meals.coffee.checked;
+                saveData();updateAll();
+            });
+            if(cafeChecked)mealsChecked++;
+            
+            // 3. DÉJEUNER (11h30) - CONSTRUCTEUR
             const lunchCal=renderCustomMeal('lunch',data);
-            totalCal+=lunchCal.cal;
-            totalProt+=lunchCal.prot;
+            if(lunchCal.cal>0){totalCal+=lunchCal.cal;totalProt+=lunchCal.prot;mealsChecked++;}
             
-            // Workout si jour d'entraînement
+            // 4. SÉANCE SPORT (15h00) si entraînement
             if(program.workout){
                 const workoutCal=dayIndex===2?-200:(dayIndex===4?-250:-250);
                 const workoutItem=document.createElement('div');
                 workoutItem.className='timeline-item';
+                workoutItem.style.background='rgba(255,59,48,0.05)';
                 workoutItem.innerHTML=`
                     <div class="timeline-time">15h00</div>
-                    <div class="timeline-content">
-                        <div class="timeline-meal">${program.type}</div>
-                        <div class="timeline-details" style="color:var(--accent);font-weight:600">-${Math.abs(workoutCal)} cal dépensées</div>
+                    <div class="timeline-content" style="border-left-color:var(--accent)">
+                        <div class="timeline-meal">💪 ${program.type}</div>
+                        <div class="timeline-details" style="color:var(--accent);font-weight:600">Dépense: ${Math.abs(workoutCal)} cal</div>
                     </div>
                 `;
                 timeline.appendChild(workoutItem);
                 totalCal+=workoutCal;
+                
+                // 5. SHAKE POST-WORKOUT (15h30)
+                const shake={time:'15h30',title:'🥤 Shake post-workout',cal:120,prot:24,items:['Whey Prozis (30g)']};
+                const shakeChecked=data.meals.shake?.checked||false;
+                addTimelineItem(timeline,shake.time,shake.title,shake.items,shake.cal,shake.prot,shakeChecked,()=>{
+                    if(!data.meals.shake)data.meals.shake={};
+                    data.meals.shake.checked=!data.meals.shake.checked;
+                    saveData();updateAll();
+                });
+                if(shakeChecked){totalCal+=shake.cal;totalProt+=shake.prot;}
             }
             
-            // Shake post-workout
-            if(program.workout){
-                addFixedMealToTimeline(timeline,'shake',data,()=>{totalCal+=120;totalProt+=24;},'15h30','Shake post-workout',[{name:'Whey Prozis (30g)',cal:120,prot:24}]);
-            }
+            // 6. GOÛTER (16h30)
+            const gouter={time:'16h30',title:'🍪 Goûter',cal:200,prot:10,items:['Muffins Prozis (1-2)']};
+            const gouterChecked=data.meals.snack?.checked||false;
+            addTimelineItem(timeline,gouter.time,gouter.title,gouter.items,gouter.cal,gouter.prot,gouterChecked,()=>{
+                if(!data.meals.snack)data.meals.snack={};
+                data.meals.snack.checked=!data.meals.snack.checked;
+                saveData();updateAll();
+            });
+            if(gouterChecked){totalCal+=gouter.cal;totalProt+=gouter.prot;mealsChecked++;}
             
-            // Goûter
-            addFixedMealToTimeline(timeline,'snack',data,()=>{totalCal+=200;totalProt+=10;mealsChecked++;});
-            
-            // Dîner (custom)
+            // 7. DÎNER (19h00) - CONSTRUCTEUR
             const dinnerCal=renderCustomMeal('dinner',data);
-            totalCal+=dinnerCal.cal;
-            totalProt+=dinnerCal.prot;
+            if(dinnerCal.cal>0){totalCal+=dinnerCal.cal;totalProt+=dinnerCal.prot;mealsChecked++;}
             
-            // Écarts
+            // 8. ÉCARTS (s'ils existent)
             if(data.ecarts&&data.ecarts.length>0){
                 let ecartsCal=0,ecartsProt=0;
+                const ecartNames=[];
                 data.ecarts.forEach(ecartId=>{
                     const ecart=ecartsList.find(e=>e.id===ecartId);
                     if(ecart){
                         ecartsCal+=ecart.cal;
                         ecartsProt+=ecart.prot;
+                        ecartNames.push(ecart.name);
                     }
                 });
+                
+                const ecartItem=document.createElement('div');
+                ecartItem.className='timeline-item ecart';
+                ecartItem.innerHTML=`
+                    <div class="timeline-time">--</div>
+                    <div class="timeline-content">
+                        <div class="timeline-meal">⚠️ Écarts <span class="ecart-badge">+${ecartsCal} cal</span></div>
+                        <div class="timeline-details">${ecartNames.join(', ')}</div>
+                    </div>
+                `;
+                timeline.appendChild(ecartItem);
+                
                 totalCal+=ecartsCal;
                 totalProt+=ecartsProt;
             }
 
+            // Mise à jour stats
             document.getElementById('stat-calories').textContent=totalCal;
             document.getElementById('stat-proteins').textContent=totalProt+'g';
             document.getElementById('stat-meals').textContent=mealsChecked+'/4';
@@ -724,99 +1001,133 @@
             const balance=totalCal-calorieGoal;
             const balanceEl=document.getElementById('stat-balance');
             balanceEl.textContent=(balance>0?'+':'')+balance;
-            balanceEl.className=`stat-value ${balance<0?'negative':'positive'}`;
+            balanceEl.className=`stat-value ${balance<=0?'negative':'positive'}`;
+            
+            // Conseil du coach
+            const tip=document.getElementById('coach-tip');
+            const tipText=document.getElementById('coach-tip-text');
+            if(balance>200){
+                tip.style.display='block';
+                tipText.textContent=`Tu es à +${balance} cal aujourd'hui. Pour compenser demain : privilégie les légumes verts et réduis les féculents au dîner.`;
+            }else if(totalProt<proteinGoal*0.8){
+                tip.style.display='block';
+                tipText.textContent=`Tes protéines sont un peu basses (${totalProt}g). Essaie d'ajouter un yaourt grec ou une portion de viande ce soir.`;
+            }else if(data.water<waterGoal*0.5){
+                tip.style.display='block';
+                tipText.textContent=`N'oublie pas de boire ! Tu es à ${Math.round((data.water||0)/waterGoal*100)}% de ton objectif d'eau.`;
+            }else{
+                tip.style.display='none';
+            }
             
             updateWaterDisplay();
         }
 
-        function addFixedMealToTimeline(timeline,mealKey,data,onChecked,timeOverride,titleOverride,itemsOverride){
-            const meal=fixedMeals[mealKey];
-            const mealData=data.meals[mealKey]||{checked:false};
-            const time=timeOverride||meal.time;
-            const title=titleOverride||meal.title;
-            const items=itemsOverride||meal.items;
-            
+        function addTimelineItem(timeline,time,title,items,cal,prot,checked,onClick){
             const item=document.createElement('div');
-            item.className=`timeline-item ${mealData.checked?'completed':''}`;
+            item.className=`timeline-item ${checked?'completed':''}`;
             
-            let detailsHtml='';
-            if(items&&items.length>0){
-                items.forEach(it=>{
-                    const protStr=it.prot?`, ${it.prot}g`:'';
-                    detailsHtml+=`<div>${it.name} <span style="color:var(--text-secondary)">(${it.cal}cal${protStr})</span></div>`;
-                });
-            }
-
-            const calDisplay=items?items.reduce((a,b)=>a+b.cal,0):0;
-            const protDisplay=items?items.reduce((a,b)=>a+(b.prot||0),0):0;
+            const detailsHtml=items.map(it=>`<div>${it}</div>`).join('');
+            const calSign=cal>=0?'+':'';
             
             item.innerHTML=`
                 <div class="timeline-time">${time}</div>
                 <div class="timeline-content">
-                    <div class="timeline-meal">${title}${protDisplay?` <span style="color:var(--protein);font-size:11px">${protDisplay}g</span>`:''}</div>
+                    <div class="timeline-meal">${title}${prot>0?` <span style="color:var(--protein);font-size:11px">${prot}g</span>`:''}</div>
                     <div class="timeline-details">${detailsHtml}</div>
                     <div class="timeline-footer">
-                        <div class="timeline-calories positive">+${calDisplay} cal</div>
+                        <div class="timeline-calories ${cal>0?'positive':cal<0?'negative':''}">${calSign}${cal} cal</div>
                         <div class="timeline-actions">
-                            <div class="checkbox ${mealData.checked?'checked':''}" data-meal="${mealKey}"></div>
+                            <div class="checkbox ${checked?'checked':''}"></div>
                         </div>
                     </div>
                 </div>
             `;
             
             timeline.appendChild(item);
-            
-            if(mealData.checked)onChecked();
-            
-            item.querySelector('.checkbox').addEventListener('click',()=>{
-                if(!data.meals[mealKey])data.meals[mealKey]={};
-                data.meals[mealKey].checked=!data.meals[mealKey].checked;
-                saveData();
-                updateAll();
-            });
+            item.querySelector('.checkbox').addEventListener('click',onClick);
         }
 
         function renderCustomMeal(mealType,data){
-            // mealType = 'lunch' ou 'dinner'
             const customData=data[`custom${mealType.charAt(0).toUpperCase()+mealType.slice(1)}`];
             let totalCal=0,totalProt=0;
             
-            // Calculer totaux
+            // Vérifier si le repas a des items
+            const hasItems=['starter','main','dessert'].some(cat=>customData[cat]?.length>0);
+            
+            // Créer le bloc de repas s'il n'existe pas encore
+            let mealBlock=document.getElementById(`${mealType}-block`);
+            if(!mealBlock){
+                mealBlock=document.createElement('div');
+                mealBlock.id=`${mealType}-block`;
+                mealBlock.className='timeline-item';
+                mealBlock.style.background='var(--bg-tertiary)';
+                
+                const time=mealType==='lunch'?'11h30':'19h00';
+                const icon=mealType==='lunch'?'🍽️':'🌙';
+                const title=mealType==='lunch'?'Déjeuner':'Dîner';
+                
+                mealBlock.innerHTML=`
+                    <div class="timeline-time">${time}</div>
+                    <div class="timeline-content" style="border-left-color:var(--accent-secondary)">
+                        <div class="timeline-meal">${icon} ${title} <span id="${mealType}-total-cal"></span></div>
+                        <div id="${mealType}-sections"></div>
+                        <button class="add-btn" style="margin-top:12px" onclick="openFoodSelector('${mealType}','starter')">+ Ajouter une entrée</button>
+                        <button class="add-btn" style="margin-top:8px" onclick="openFoodSelector('${mealType}','main')">+ Ajouter un plat</button>
+                        <button class="add-btn" style="margin-top:8px" onclick="openFoodSelector('${mealType}','dessert')">+ Ajouter un dessert</button>
+                    </div>
+                `;
+                
+                // Insérer après le café (déjeuner) ou après le goûter (dîner)
+                const timeline=document.getElementById('timeline-list');
+                if(mealType==='lunch'&&timeline.children.length>=2){
+                    timeline.insertBefore(mealBlock,timeline.children[2]);
+                }else if(mealType==='dinner'){
+                    timeline.appendChild(mealBlock);
+                }else{
+                    timeline.appendChild(mealBlock);
+                }
+            }
+            
+            // Mettre à jour les sections
+            const sectionsContainer=mealBlock.querySelector(`#${mealType}-sections`);
+            sectionsContainer.innerHTML='';
+            
             ['starter','main','dessert'].forEach(category=>{
-                if(customData[category]){
-                    customData[category].forEach(item=>{
+                if(customData[category]&&customData[category].length>0){
+                    const catDiv=document.createElement('div');
+                    catDiv.style.marginBottom='12px';
+                    
+                    const catTitle=document.createElement('div');
+                    catTitle.style.cssText='font-size:12px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px';
+                    catTitle.textContent=category==='starter'?'Entrées':category==='main'?'Plats':'Desserts';
+                    catDiv.appendChild(catTitle);
+                    
+                    customData[category].forEach((item,idx)=>{
                         totalCal+=item.cal;
                         totalProt+=item.prot;
+                        
+                        const itemDiv=document.createElement('div');
+                        itemDiv.className='selected-item';
+                        itemDiv.style.marginBottom='6px';
+                        itemDiv.innerHTML=`
+                            <div class="selected-item-info">
+                                <div class="selected-item-name">${item.name}</div>
+                                <div class="selected-item-macro">${item.cal} cal • ${item.prot}g prot</div>
+                            </div>
+                            <button class="remove-btn" onclick="removeFood('${mealType}','${category}',${idx})">×</button>
+                        `;
+                        catDiv.appendChild(itemDiv);
                     });
+                    
+                    sectionsContainer.appendChild(catDiv);
                 }
-                // Mettre à jour l'affichage
-                updateCustomMealDisplay(mealType,category,customData[category]||[]);
             });
             
-            // Mettre à jour totaux
-            document.getElementById(`${mealType}-total`).textContent=`${totalCal} cal / ${totalProt}g prot`;
+            // Mettre à jour le total affiché
+            const totalEl=mealBlock.querySelector(`#${mealType}-total-cal`);
+            if(totalEl)totalEl.textContent=`(${totalCal} cal / ${totalProt}g)`;
             
             return {cal:totalCal,prot:totalProt};
-        }
-
-        function updateCustomMealDisplay(mealType,category,items){
-            const container=document.getElementById(`${mealType}-${category}-items`);
-            const countEl=document.getElementById(`${mealType}-${category}-count`);
-            container.innerHTML='';
-            countEl.textContent=`(${items.length})`;
-            
-            items.forEach((item,index)=>{
-                const div=document.createElement('div');
-                div.className='selected-item';
-                div.innerHTML=`
-                    <div class="selected-item-info">
-                        <div class="selected-item-name">${item.name}</div>
-                        <div class="selected-item-macro">${item.cal} cal • ${item.prot}g prot</div>
-                    </div>
-                    <button class="remove-btn" onclick="removeFood('${mealType}','${category}',${index})">×</button>
-                `;
-                container.appendChild(div);
-            });
         }
 
         function openFoodSelector(mealType,category){
@@ -828,14 +1139,15 @@
             foods.forEach(food=>{
                 const option=document.createElement('option');
                 option.value=food.id;
-                option.textContent=`${food.name} (${food.cal} cal, ${food.prot}g)`;
+                option.textContent=`${food.name} — ${food.cal} cal, ${food.prot}g prot`;
                 option.dataset.cal=food.cal;
                 option.dataset.prot=food.prot;
                 option.dataset.name=food.name;
                 select.appendChild(option);
             });
             
-            document.getElementById('food-modal-title').textContent=`Ajouter ${category==='starter'?'une entrée':category==='main'?'un plat':'un dessert'}`;
+            const titles={starter:'une entrée',main:'un plat',dessert:'un dessert'};
+            document.getElementById('food-modal-title').textContent=`Ajouter ${titles[category]}`;
             document.getElementById('food-modal').classList.add('show');
         }
 
@@ -908,6 +1220,15 @@
             updateAll();
         }
 
+        function resetCurrentDay(){
+            if(confirm('Réinitialiser cette journée ? Tous les repas seront remis à zéro.')){
+                const key=formatDateKey(selectedDate);
+                dayData[key]={meals:{},validated:false,ecarts:[],water:0,customLunch:{starter:[],main:[],dessert:[]},customDinner:{starter:[],main:[],dessert:[]}};
+                saveData();
+                updateAll();
+            }
+        }
+
         // PAGE SEMAINE
         function updateWeekPage(){
             const weekStart=getWeekStart(selectedDate);
@@ -924,13 +1245,12 @@
                 
                 let totalCal=0,totalProt=0;
                 
-                // Repas fixes cochés
+                // Calculer les totaux de la journée
                 if(data.meals.breakfast?.checked){totalCal+=550;totalProt+=43;}
                 if(data.meals.snack?.checked){totalCal+=200;totalProt+=10;}
                 if(program.workout)totalCal+=(dayIndex===2?-200:-250);
                 if(data.meals.shake?.checked){totalCal+=120;totalProt+=24;}
                 
-                // Repas custom
                 ['customLunch','customDinner'].forEach(mealKey=>{
                     const meal=data[mealKey];
                     if(meal){
@@ -945,7 +1265,6 @@
                     }
                 });
                 
-                // Écarts
                 if(data.ecarts){
                     data.ecarts.forEach(id=>{
                         const ecart=ecartsList.find(e=>e.id===id);
@@ -966,7 +1285,7 @@
                     <div class="week-day-stats">
                         <div>
                             <div class="week-stat-value" style="color:${totalCal>calorieGoal?'var(--accent)':'var(--success)'}">${totalCal}</div>
-                            <div class="week-stat-label">Calories</div>
+                            <div class="week-stat-label">Cal</div>
                         </div>
                         <div>
                             <div class="week-stat-value" style="color:var(--protein)">${totalProt}g</div>
@@ -974,7 +1293,7 @@
                         </div>
                         <div>
                             <div class="week-stat-value" style="color:var(--water)">${Math.round((data.water||0)/250)}/${WATER_CUPS}</div>
-                            <div class="week-stat-label">Verres</div>
+                            <div class="week-stat-label">Eau</div>
                         </div>
                     </div>
                 `;
@@ -987,15 +1306,14 @@
             updateAll();
         }
 
-        // PAGE STATS
+        // PAGE STATS & POIDS
         function updateStatsPage(){
+            // Calculer moyennes semaine
             const weekStart=getWeekStart(selectedDate);
             let totalCal=0,totalProt=0,totalWater=0,workouts=0;
             
             const caloriesChart=document.getElementById('calories-chart');
-            const proteinChart=document.getElementById('protein-chart');
             caloriesChart.innerHTML='';
-            proteinChart.innerHTML='';
             
             for(let i=0;i<7;i++){
                 const date=addDays(weekStart,i);
@@ -1035,29 +1353,116 @@
                 totalProt+=dayProt;
                 totalWater+=(data.water||0);
                 
-                // Barres graphiques
-                const maxCal=3000;
-                const maxProt=200;
-                
-                const calBar=document.createElement('div');
-                calBar.className='bar';
-                calBar.style.height=`${Math.min(100,(Math.abs(dayCal)/maxCal)*100)}%`;
-                calBar.style.background=dayCal>calorieGoal?'var(--accent)':'var(--success)';
-                calBar.innerHTML=`<div class="bar-value">${dayCal}</div><div class="bar-label">${getDayName(date)}</div>`;
-                caloriesChart.appendChild(calBar);
-                
-                const protBar=document.createElement('div');
-                protBar.className='bar';
-                protBar.style.height=`${Math.min(100,(dayProt/maxProt)*100)}%`;
-                protBar.style.background='var(--protein)';
-                protBar.innerHTML=`<div class="bar-value">${dayProt}</div><div class="bar-label">${getDayName(date)}</div>`;
-                proteinChart.appendChild(protBar);
+                // Barre graphique
+                const bar=document.createElement('div');
+                bar.style.cssText=`flex:1;background:${dayCal>calorieGoal?'var(--accent)':'var(--success)'};border-radius:4px 4px 0 0;min-height:4px;height:${Math.min(100,(Math.abs(dayCal)/3000)*100)}%;position:relative`;
+                bar.innerHTML=`<div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:600">${dayCal}</div><div style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text-secondary)">${getDayName(date)}</div>`;
+                caloriesChart.appendChild(bar);
             }
             
             document.getElementById('avg-cal').textContent=Math.round(totalCal/7);
             document.getElementById('avg-prot').textContent=Math.round(totalProt/7)+'g';
             document.getElementById('total-workouts').textContent=workouts;
             document.getElementById('avg-water').textContent=Math.round(totalWater/7)+'ml';
+            
+            // Mettre à jour IMC
+            updateIMC();
+            
+            // Graphique poids
+            updateWeightGraph();
+        }
+
+        function updateIMC(){
+            if(userHeight>0&&userWeight>0){
+                const heightM=userHeight/100;
+                const imc=(userWeight/(heightM*heightM)).toFixed(1);
+                document.getElementById('imc-value').textContent=imc;
+                
+                let position=0;
+                let color='var(--imc-normal)';
+                let text='';
+                
+                if(imc<18.5){position=15;text='Maigreur - À surveiller';color='var(--imc-warning)';}
+                else if(imc<25){position=50;text='Poids normal - Parfait !';color='var(--imc-normal)';}
+                else if(imc<30){position=75;text='Surpoids - Attention';color='var(--imc-warning)';}
+                else{position=90;text='Obésité - Consultation recommandée';color='var(--imc-danger)';}
+                
+                document.getElementById('imc-indicator').style.left=position+'%';
+                document.getElementById('imc-value').style.color=color;
+                document.getElementById('imc-text').textContent=text;
+                
+                // Calcul TDEE estimé
+                const tdee=Math.round(10*userWeight+6.25*userHeight-5*30+5); // Simplifié pour homme 30 ans
+                document.getElementById('tdee-estimate').textContent=tdee;
+            }
+        }
+
+        function updateWeightGraph(){
+            const pointsContainer=document.getElementById('weight-points');
+            pointsContainer.innerHTML='';
+            
+            if(weightHistory.length===0){
+                pointsContainer.innerHTML='<div style="color:var(--text-secondary);text-align:center;width:100%">Pas encore de données de poids</div>';
+                document.getElementById('weight-start').textContent='--';
+                document.getElementById('weight-current').textContent='--';
+                document.getElementById('weight-goal-display').textContent=goalWeight+'kg';
+                document.getElementById('weight-lost').textContent='--';
+                return;
+            }
+            
+            // Trier par date
+            weightHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
+            
+            const last7=weightHistory.slice(-7);
+            const min=Math.min(...last7.map(w=>w.weight))-1;
+            const max=Math.max(...last7.map(w=>w.weight))+1;
+            const range=max-min;
+            
+            last7.forEach((entry,idx)=>{
+                const heightPct=((entry.weight-min)/range)*80+10;
+                const point=document.createElement('div');
+                point.className='weight-point';
+                point.style.height=heightPct+'%';
+                point.innerHTML=`
+                    <div class="weight-value">${entry.weight.toFixed(1)}</div>
+                    <div class="weight-dot"></div>
+                    <div class="weight-date">${new Date(entry.date).getDate()}/${new Date(entry.date).getMonth()+1}</div>
+                `;
+                pointsContainer.appendChild(point);
+            });
+            
+            // Stats
+            document.getElementById('weight-start').textContent=weightHistory[0].weight.toFixed(1)+'kg';
+            const current=weightHistory[weightHistory.length-1].weight;
+            document.getElementById('weight-current').textContent=current.toFixed(1)+'kg';
+            document.getElementById('weight-goal-display').textContent=goalWeight+'kg';
+            const lost=weightHistory[0].weight-current;
+            document.getElementById('weight-lost').textContent=(lost>0?'-':'+')+Math.abs(lost).toFixed(1)+'kg';
+        }
+
+        function openWeightModal(){
+            document.getElementById('new-weight').value='';
+            document.getElementById('weight-date').value=formatDateKey(new Date());
+            document.getElementById('weight-modal').classList.add('show');
+        }
+
+        function closeWeightModal(){
+            document.getElementById('weight-modal').classList.remove('show');
+        }
+
+        function saveWeight(){
+            const weight=parseFloat(document.getElementById('new-weight').value);
+            const date=document.getElementById('weight-date').value;
+            
+            if(weight>0&&date){
+                // Enlever ancienne entrée pour cette date si existe
+                weightHistory=weightHistory.filter(w=>w.date!==date);
+                weightHistory.push({date,weight});
+                userWeight=weight; // Mettre à jour poids actuel
+                saveData();
+                updateAll();
+                closeWeightModal();
+            }
         }
 
         // PARAMÈTRES
@@ -1069,12 +1474,62 @@
             updateAll();
         }
 
+        function updateProfile(){
+            userHeight=parseInt(document.getElementById('setting-height').value)||175;
+            goalWeight=parseFloat(document.getElementById('setting-goal-weight').value)||75;
+            saveData();
+            updateStatsPage();
+        }
+
+        function exportData(){
+            const data=JSON.stringify({dayData,weightHistory,settings:{calorieGoal,waterGoal,proteinGoal,userHeight,userWeight,goalWeight}});
+            const blob=new Blob([data],{type:'application/json'});
+            const url=URL.createObjectURL(blob);
+            const a=document.createElement('a');
+            a.href=url;
+            a.download=`nutrition_backup_${formatDateKey(new Date())}.json`;
+            a.click();
+        }
+
+        function importData(){
+            const input=document.createElement('input');
+            input.type='file';
+            input.accept='.json';
+            input.onchange=e=>{
+                const file=e.target.files[0];
+                const reader=new FileReader();
+                reader.onload=event=>{
+                    try{
+                        const data=JSON.parse(event.target.result);
+                        if(data.dayData)dayData=data.dayData;
+                        if(data.weightHistory)weightHistory=data.weightHistory;
+                        if(data.settings){
+                            calorieGoal=data.settings.calorieGoal||2200;
+                            waterGoal=data.settings.waterGoal||3000;
+                            proteinGoal=data.settings.proteinGoal||180;
+                            userHeight=data.settings.userHeight||175;
+                            userWeight=data.settings.userWeight||80;
+                            goalWeight=data.settings.goalWeight||75;
+                        }
+                        saveData();
+                        init();
+                        alert('Données restaurées !');
+                    }catch(err){
+                        alert('Erreur lors de l\'import');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
         function resetAllData(){
-            if(confirm('⚠️ Supprimer toutes les données ? Cette action est irréversible.')){
+            if(confirm('⚠️ SUPPRIMER TOUTES LES DONNÉES ? Cette action est irréversible !')){
                 dayData={};
+                weightHistory=[];
                 saveData();
                 updateAll();
-                alert('Données réinitialisées');
+                alert('Toutes les données ont été effacées');
             }
         }
 
@@ -1083,24 +1538,18 @@
             const data=getDayData(selectedDate);
             const dayIndex=selectedDate.getDay()===0?6:selectedDate.getDay()-1;
             
-            let baseCal=0,baseProt=0;
-            
-            // Calculer les calories de base (repas cochés)
-            if(data.meals.breakfast?.checked){baseCal+=550;baseProt+=43;}
-            if(data.meals.snack?.checked){baseCal+=200;baseProt+=10;}
+            let baseCal=0;
+            if(data.meals.breakfast?.checked)baseCal+=550;
+            if(data.meals.snack?.checked)baseCal+=200;
             if(PROGRAM[dayIndex].workout)baseCal+=(dayIndex===2?-200:-250);
-            if(data.meals.shake?.checked){baseCal+=120;baseProt+=24;}
+            if(data.meals.shake?.checked)baseCal+=120;
             
-            // Repas custom
             ['customLunch','customDinner'].forEach(mealKey=>{
                 const meal=data[mealKey];
                 if(meal){
                     ['starter','main','dessert'].forEach(cat=>{
                         if(meal[cat]){
-                            meal[cat].forEach(item=>{
-                                baseCal+=item.cal;
-                                baseProt+=item.prot;
-                            });
+                            meal[cat].forEach(item=>baseCal+=item.cal);
                         }
                     });
                 }
@@ -1131,55 +1580,40 @@
                     opt.innerHTML=`
                         <span class="deviation-name">${ecart.name}</span>
                         <span class="deviation-cal">+${ecart.cal} cal</span>
-                        <span class="deviation-protein">+${ecart.prot}g prot</span>
                     `;
                     opt.addEventListener('click',()=>{
                         opt.classList.toggle('selected');
-                        updateBilanCalculations(baseCal,baseProt);
+                        updateBilanCalculations(baseCal);
                     });
                     grid.appendChild(opt);
                 });
             });
 
-            updateBilanCalculations(baseCal,baseProt);
+            updateBilanCalculations(baseCal);
             document.getElementById('bilan-modal').classList.add('show');
         }
 
-        function updateBilanCalculations(baseCal,baseProt){
+        function updateBilanCalculations(baseCal){
             const selectedOptions=document.querySelectorAll('.deviation-option.selected');
-            let ecartsCal=0,ecartsProt=0;
-            
+            let ecartsCal=0;
             selectedOptions.forEach(opt=>{
                 const ecart=ecartsList.find(e=>e.id===opt.dataset.id);
-                if(ecart){
-                    ecartsCal+=ecart.cal;
-                    ecartsProt+=ecart.prot;
-                }
+                if(ecart)ecartsCal+=ecart.cal;
             });
 
             document.getElementById('total-ecarts').textContent='+'+ecartsCal+' cal';
-            document.getElementById('total-ecarts-prot').textContent='+'+ecartsProt+'g';
             
             const finalBalance=(baseCal+ecartsCal)-calorieGoal;
             const finalEl=document.getElementById('bilan-final');
             finalEl.textContent=(finalBalance>0?'+':'')+finalBalance+' cal';
             finalEl.className='summary-value '+(finalBalance<0?'positive':'negative');
 
-            const tomorrow=addDays(selectedDate,1);
-            const tomorrowIndex=tomorrow.getDay()===0?6:tomorrow.getDay()-1;
-            const tomorrowProgram=PROGRAM[tomorrowIndex];
-            
             const suggestionBox=document.getElementById('suggestion-box');
             const suggestionText=document.getElementById('suggestion-text');
             
             if(ecartsCal>0){
                 suggestionBox.style.display='block';
-                if(tomorrowProgram.workout){
-                    suggestionText.innerHTML=`Demain c'est <strong>${tomorrowProgram.type}</strong>.<br><br>Pour compenser :<br>• Ajoute 10 min de cardio<br>• Ou réduis les glucides au dîner`;
-                }else{
-                    const reduc=Math.min(Math.floor(ecartsCal/2),300);
-                    suggestionText.innerHTML=`Demain c'est <strong>REPOS</strong>.<br><br>Rééquilibre :<br>• Évite les féculents au dîner (-200 cal)<br>• Privilégie les légumes<br>• Objectif : -${reduc} cal`;
-                }
+                suggestionText.innerHTML=`Demain :<br>• Petit-déj léger (-100 cal)<br>• Privilégier salade verte<br>• +10 min cardio si séance`;
             }else{
                 suggestionBox.style.display='none';
             }
